@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\BrandResource\Pages;
-use App\Filament\Resources\BrandResource\RelationManagers;
-use App\Models\Brand;
+use App\Filament\Resources\StoreResource\Pages;
+use App\Filament\Resources\StoreResource\RelationManagers;
+use App\Models\Store;
 use Filament\Forms;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -14,9 +13,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class BrandResource extends Resource
+class StoreResource extends Resource
 {
-    protected static ?string $model = Brand::class;
+    protected static ?string $model = Store::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -27,17 +26,20 @@ class BrandResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-
-                Forms\Components\FileUpload::make('logo')
+                Forms\Components\Textarea::make('address')
+                    ->required(),
+                Forms\Components\FileUpload::make('thumbnail')
                     ->required()
                     ->image(),
-                Forms\Components\Repeater::make('brandCategories')
-                    ->relationship()
-                    ->schema([
-                        Select::make('category_id')
-                            ->relationship('category', 'name')
-                            ->required(),
-                    ]),
+
+
+
+                Forms\Components\Select::make('is_open')
+                    ->options([
+                        true => 'Open',
+                        false => 'Close'
+                    ])
+                    ->required(),
             ]);
     }
 
@@ -48,16 +50,28 @@ class BrandResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
-                    ->searchable(),
-                Tables\Columns\ImageColumn::make('logo'),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\ImageColumn::make('thumbnail'),
+
+                Tables\Columns\IconColumn::make('is_open')
+                    ->boolean()
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->label('Buka?'),
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -86,9 +100,9 @@ class BrandResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBrands::route('/'),
-            'create' => Pages\CreateBrand::route('/create'),
-            'edit' => Pages\EditBrand::route('/{record}/edit'),
+            'index' => Pages\ListStores::route('/'),
+            'create' => Pages\CreateStore::route('/create'),
+            'edit' => Pages\EditStore::route('/{record}/edit'),
         ];
     }
 }
