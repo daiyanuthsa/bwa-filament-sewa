@@ -21,6 +21,9 @@ class Product extends Model
         'brand_id',
         'category_id',
     ];
+    protected $casts = [
+        'price' => MoneyCast::class,
+    ];
 
     /**
      * Get the brand associated with the product.
