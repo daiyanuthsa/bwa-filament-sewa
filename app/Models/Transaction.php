@@ -34,6 +34,16 @@ class Transaction extends Model
         'ended_date' => 'date',
     ];
 
+    public static function generateUniqueTrxId(){
+        $prefix = 'SEWA';
+        $datePart = now()->format('dmY-His');
+        do{$randomNumber = rand(1000, 9999);
+        } while(self::where('trx_id', "{$prefix}-{$datePart}-{$randomNumber}")->exists());
+        
+
+        return "{$prefix}-{$datePart}-{$randomNumber}";
+    }
+
     /**
      * Get the product associated with the transaction.
      */
